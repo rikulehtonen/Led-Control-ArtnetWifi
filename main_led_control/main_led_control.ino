@@ -16,7 +16,7 @@ CRGB led_buffer[numLeds];
 
 // Art-Net settings
 ArtnetWifi artnet;
-const int startUniverse = 1; // CHANGE FOR YOUR SETUP most software this is 1, some software send out artnet first universe as 0.
+const int startUniverse = 2; // CHANGE FOR YOUR SETUP most software this is 1, some software send out artnet first universe as 0.
 
 // Check if we got all universes
 const int maxUniverses = numberOfChannels / 512 + ((numberOfChannels % 512) ? 1 : 0);
@@ -35,7 +35,6 @@ bool ConnectWifi(void)
 {
   bool state = true;
   int i = 0;
-
   WiFi.begin(ssid, password);
 
   // Wait for connection
@@ -161,9 +160,9 @@ void animate() {
 }
 
 void setup() {
+  Serial.begin(9600);
   // Initialize the LEDs
   initLeds();
-
   ConnectWifi();
   artnet.begin();
 
