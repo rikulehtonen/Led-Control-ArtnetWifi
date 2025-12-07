@@ -7,6 +7,7 @@
 // Wifi settings
 const char ssid[] = SECRET_SSID;
 const char password[] = SECRET_PASS;
+int status = WL_IDLE_STATUS;     // the WiFi radio's status
 
 // LED settings
 const int numberOfChannels = numLeds * 3; // Total number of channels you want to receive (1 led = 3 channels)
@@ -16,7 +17,7 @@ CRGB led_buffer[numLeds];
 
 // Art-Net settings
 ArtnetWifi artnet;
-const int startUniverse = 2; // CHANGE FOR YOUR SETUP most software this is 1, some software send out artnet first universe as 0.
+const int startUniverse = UNIVERSE; // CHANGE FOR YOUR SETUP most software this is 1, some software send out artnet first universe as 0.
 
 // Check if we got all universes
 const int maxUniverses = numberOfChannels / 512 + ((numberOfChannels % 512) ? 1 : 0);
@@ -35,13 +36,27 @@ bool ConnectWifi(void)
 {
   bool state = true;
   int i = 0;
-  WiFi.begin(ssid, password);
+  // check for the WiFi module:
+  if (WiFi.status() == WL_NO_MODULE) {
+    Serial.println("Communication with WiFi module failed!");
+    // don't continue
+    while (true);
+  }
+
+  String fv = WiFi.firmwareVersion();
+  if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
+    Serial.println("Please upgrade the firmware");
+  }
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED)
   {
-    delay(500);
-    if (i > 20)
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, password);
+
+    delay(10000);
+    if (i > 4)
     {
       state = false;
       break;
@@ -50,12 +65,14 @@ bool ConnectWifi(void)
   }
   if (state)
   {
+    Serial.print("connection ok");
     led_live[0] = CRGB(0,255,0);
     FastLED.show();
     delay(2000);
   }
   else
   {
+    Serial.print("connection fail");
     led_live[0] = CRGB(0,255,0);
     FastLED.show();
     delay(2000);

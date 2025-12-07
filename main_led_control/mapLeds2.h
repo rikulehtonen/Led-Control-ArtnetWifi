@@ -3,30 +3,24 @@
 
 #include <FastLED.h>
 
+#define UNIVERSE 2
+
 // LED settings
-const int numLeds = 36; // Total number of LEDs
-const int numLedsPerStrip = 18; // Number of LEDs per strip
+const int numLeds = 10; // Total number of LEDs
+const int numLedsPerStrip = 10; // Number of LEDs per strip
 const byte dataPin1 = 3; // Pin for strip1
-const byte dataPin2 = 6; // Pin for strip2
 
 // Arrays to store LED data
 CRGB strip1[numLedsPerStrip];
 int strip1_order[numLedsPerStrip];
-CRGB strip2[numLedsPerStrip];
-int strip2_order[numLedsPerStrip];
 
 // Function to initialize the LED strips and their configurations
 void initLeds() {
   // Initialize FastLED for both strips
-  FastLED.addLeds<APA106, dataPin1, RGB>(strip1, numLedsPerStrip);  // LEDs 1-18 on pin 3
-  FastLED.addLeds<APA106, dataPin2, RGB>(strip2, numLedsPerStrip);  // LEDs 19-36 on pin 6
+  FastLED.addLeds<WS2811, dataPin1, RGB>(strip1, numLedsPerStrip);  // LEDs 1-18 on pin 3
 
-  // Set up the order arrays for strip1 and strip2
   for(int i = 0; i < numLedsPerStrip; i++) {
-    strip1_order[i] = numLedsPerStrip - 1 - i;
-  }
-  for(int i = 0; i < numLedsPerStrip; i++) {
-    strip2_order[i] = i + numLedsPerStrip;
+    strip1_order[i] = i;
   }
 }
 
@@ -37,10 +31,6 @@ void mapLeds(CRGB* led_live) {
     strip1[i] = led_live[strip1_order[i]];
   }
   
-  // Map the LEDs for strip2
-  for (int i = 0; i < numLedsPerStrip; i++) {
-    strip2[i] = led_live[strip2_order[i]];
-  }
 }
 
 #endif
